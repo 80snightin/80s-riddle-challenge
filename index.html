@@ -121,20 +121,19 @@
   <div class="grid"></div>
 
 <script>
-  const TIMER_SECONDS = 240;
+  const TIMER_SECONDS = 240; 
   const RIDDLES = [
-    {q:"The Keeper of No Keys\nI have many rooms, but no doors.\nYou can enter, but never leave.\nMy walls are invisible,\nAnd my guests are always light.\nWhat am I?", a:"A camera (film/sensor capturing light)"},
-    {q:"The Silent Messenger\nI speak without a mouth,\nAnd hear without ears.\nI have no body,\nBut I come alive with wind.\nWhat am I?", a:"An echo"},
-    {q:"The Timeless Traveler\nI move without legs,\nI count without numbers,\nI end without dying,\nAnd I start without being born.\nWhat am I?", a:"Time"},
-    {q:"The Forever Prison\nI’m built without bricks,\nGuarded without guards.\nThe moment you enter me,\nYou’re already gone.\nWhat am I?", a:"The past"},
-    {q:"The Hunger with No Stomach\nI consume all I touch —\nYet never eat a bite.\nI can grow without water,\nAnd die without air.\nWhat am I?", a:"Fire"},
-    {q:"The Twin of Opposites\nI am your reflection,\nBut not your twin.\nI do what you do,\nBut backwards and thin.\nWhat am I?", a:"A mirror reflection"},
-    {q:"The Endless Staircase\nI rise without steps,\nI fall without breaking.\nI’m always moving,\nBut I stay in one place.\nWhat am I?", a:"A river"},
-    {q:"The Weightless Holder\nI can carry a ton,\nYet weigh nothing at all.\nThe more you put in me,\nThe lighter I become.\nWhat am I?", a:"A hole"},
-    {q:"The Puzzle Without Pieces\nI have no corners,\nNo edges to find.\nI can trap you for hours,\nAll inside your mind.\nWhat am I?", a:"A riddle"},
-    {q:"The Whisper in Stone\nI am ancient,\nYet I speak without age.\nMy voice is loudest\nWhen you stand far away.\nWhat am I?", a:"A whispering gallery / echoing canyon"}
+    { q: "The Keeper of No Keys\nI have many rooms, but no doors.\nYou can enter, but never leave.\nMy walls are invisible,\nAnd my guests are always light.\nWhat am I?", a: "A camera (film/sensor capturing light)" },
+    { q: "The Silent Messenger\nI speak without a mouth,\nAnd hear without ears.\nI have no body,\nBut I come alive with wind.\nWhat am I?", a: "An echo" },
+    { q: "The Timeless Traveler\nI move without legs,\nI count without numbers,\nI end without dying,\nAnd I start without being born.\nWhat am I?", a: "Time" },
+    { q: "The Forever Prison\nI’m built without bricks,\nGuarded without guards.\nThe moment you enter me,\nYou’re already gone.\nWhat am I?", a: "The past" },
+    { q: "The Hunger with No Stomach\nI consume all I touch —\nYet never eat a bite.\nI can grow without water,\nAnd die without air.\nWhat am I?", a: "Fire" },
+    { q: "The Twin of Opposites\nI am your reflection,\nBut not your twin.\nI do what you do,\nBut backwards and thin.\nWhat am I?", a: "A mirror reflection" },
+    { q: "The Endless Staircase\nI rise without steps,\nI fall without breaking.\nI’m always moving,\nBut I stay in one place.\nWhat am I?", a: "A river" },
+    { q: "The Weightless Holder\nI can carry a ton,\nYet weigh nothing at all.\nThe more you put in me,\nThe lighter I become.\nWhat am I?", a: "A hole" },
+    { q: "The Puzzle Without Pieces\nI have no corners,\nNo edges to find.\nI can trap you for hours,\nAll inside your mind.\nWhat am I?", a: "A riddle" },
+    { q: "I’m tall when I’m young, and short when I’m old.\nWhat am I?", a: "A candle" }
   ];
-
   const screenEl = document.getElementById('screen');
   let idx = 0, timeLeft = TIMER_SECONDS, tick = null, answerShown = false;
 
@@ -151,19 +150,14 @@
       setTimeout(()=>{ o.stop(); ctx.close(); }, ms);
     }catch(e){}
   }
-
-  function startGame(){
-    idx = 0;
-    showRiddle();
-  }
-
+  function startGame(){ idx = 0; showRiddle(); }
   function showRiddle(){
     clearInterval(tick);
     answerShown = false;
     timeLeft = TIMER_SECONDS;
     const { q, a } = RIDDLES[idx];
     screenEl.innerHTML = `
-      <div id="riddle">${q}</div>
+      <div id="riddle" aria-live="polite">${q}</div>
       <div id="timer">Time left: ${fmt(timeLeft)}</div>
       <button class="btn" id="revealBtn">Reveal Answer</button>
       <div id="answer">Answer: ${a}</div>
@@ -181,7 +175,6 @@
       }
     }, 1000);
   }
-
   function revealAnswer(){
     if(answerShown) return;
     answerShown = true;
@@ -191,36 +184,25 @@
     const controls = document.createElement('div');
     controls.className = 'row';
     const isLast = idx === RIDDLES.length - 1;
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = isLast ? 'Finish' : 'Next Riddle';
-    btn.addEventListener('click', ()=>{
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn';
+    nextBtn.textContent = isLast ? 'Finished! Play Again' : 'Next Riddle';
+    nextBtn.addEventListener('click', ()=>{
       if(isLast){
-        showFinishScreen();
-      } else {
+        startGame();
+      }else{
         idx++;
         showRiddle();
       }
     });
-    controls.appendChild(btn);
+    controls.appendChild(nextBtn);
     screenEl.appendChild(controls);
   }
-
-  function showFinishScreen(){
-    screenEl.innerHTML = `
-      <h2 style="color:var(--neon-pink);text-shadow:0 0 10px var(--neon-pink)">All riddles complete!</h2>
-      <p style="color:var(--ink);">You’ve mastered the 80s Riddle Challenge!</p>
-      <button class="btn" id="restartBtn">Play Again</button>
-    `;
-    document.getElementById('restartBtn').addEventListener('click', startGame);
-  }
-
   function fmt(s){
     const m = Math.floor(s/60);
     const sec = String(s%60).padStart(2,'0');
     return `${m}:${sec}`;
   }
-
   document.getElementById('startBtn').addEventListener('click', startGame);
 </script>
 </body>
