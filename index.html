@@ -4,39 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>80s Riddle Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
     body {
-        background: linear-gradient(135deg, #1a0033, #330066, #6600cc);
-        color: #fff;
+        background: linear-gradient(135deg, #ff00ff, #000000, #00ffff);
         font-family: 'Press Start 2P', cursive;
+        color: #fff;
         text-align: center;
-        margin: 0;
-        padding: 0;
+        padding: 20px;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
-    h1, h2, p {
-        text-shadow: 0 0 5px #00ffff, 0 0 10px #ff00ff;
+    h1, h2 {
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff;
+    }
+    #game, #finished {
+        display: none;
     }
     button {
         background: #00ffff;
         border: none;
         padding: 15px 30px;
-        font-size: 18px;
+        font-size: 16px;
+        color: #000;
         font-family: 'Press Start 2P', cursive;
-        margin: 10px;
-        border-radius: 8px;
         cursor: pointer;
+        border-radius: 8px;
+        margin: 10px;
         box-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff;
-        transition: transform 0.2s;
+        transition: transform 0.2s ease-in-out;
     }
     button:hover {
         transform: scale(1.05);
-    }
-    #game, #finished {
-        display: none;
     }
     #timer {
         font-size: 20px;
@@ -44,7 +45,6 @@
         color: #ff00ff;
     }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -62,8 +62,8 @@
 </div>
 
 <div id="finished">
-    <h1>🎉 Game Over 🎉</h1>
-    <p>You’ve completed all the riddles!</p>
+    <h1>🎉 Game Finished 🎉</h1>
+    <p>You solved all the riddles! Totally radical!</p>
     <button onclick="restartGame()">Play Again</button>
 </div>
 
@@ -87,6 +87,7 @@ let timeLeft = 240; // 4 minutes
 
 function startGame() {
     document.getElementById('start').style.display = 'none';
+    document.getElementById('finished').style.display = 'none';
     document.getElementById('game').style.display = 'block';
     current = 0;
     showRiddle();
@@ -143,8 +144,7 @@ function endGame() {
 }
 
 function restartGame() {
-    document.getElementById('finished').style.display = 'none';
-    document.getElementById('start').style.display = 'block';
+    startGame();
 }
 </script>
 
