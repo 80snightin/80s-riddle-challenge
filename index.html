@@ -50,17 +50,6 @@
     .hidden {
         display: none;
     }
-    /* Retro corner icons */
-    .retro-icon {
-        position: absolute;
-        width: 60px;
-        height: 60px;
-    }
-    .top-left { top: 10px; left: 10px; }
-    .top-right { top: 10px; right: 10px; }
-    .bottom-left { bottom: 10px; left: 10px; }
-    .bottom-right { bottom: 10px; right: 10px; }
-    /* 80s grid floor animation */
     .grid-floor {
         position: absolute;
         bottom: 0;
@@ -91,41 +80,78 @@
 </head>
 <body>
 
-<!-- Retro icons in corners -->
-<img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Cassette_tape_icon.svg" class="retro-icon top-left" alt="Cassette">
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Rubik%27s_cube_icon.svg" class="retro-icon top-right" alt="Rubik's Cube">
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Joystick_icon.svg" class="retro-icon bottom-left" alt="Joystick">
-<img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Floppy_disk_icon.svg" class="retro-icon bottom-right" alt="Floppy Disk">
-
 <div id="riddle-box">
     <div class="title">80s Riddle Challenge</div>
-    <p id="riddle-text">The Endless Staircase — I rise without steps, I fall without breaking. I’m always moving, but I stay in one place. What am I?</p>
-    <p id="timer">Time left: 4:00</p>
-    <button onclick="revealAnswer()">Reveal Answer</button>
-    <p id="answer" class="hidden">An escalator!</p>
+    <div id="game-screen">
+        <button onclick="startGame()">Play Now</button>
+    </div>
 </div>
 
 <div class="grid-floor"></div>
 
 <script>
-    let timeLeft = 240;
-    const timerElement = document.getElementById("timer");
+const riddles = [
+    { q: "The Keeper of No Keys — I have many rooms, but no doors. You can enter, but never leave. My walls are invisible, And my guests are always light. What am I?", a: "A camera" },
+    { q: "The Silent Messenger — I speak without a mouth, And hear without ears. I have no body, But I come alive with wind. What am I?", a: "An echo" },
+    { q: "The Timeless Traveler — I move without legs, I count without numbers, I end without dying, And I start without being born. What am I?", a: "Time" },
+    { q: "The Forever Prison — I’m built without bricks, Guarded without guards. The moment you enter me, You’re already gone. What am I?", a: "The past" },
+    { q: "The Hunger with No Stomach — I consume all I touch — Yet never eat a bite. I can grow without water, And die without air. What am I?", a: "Fire" },
+    { q: "The Twin of Opposites — I am your reflection, But not your twin. I do what you do, But backwards and thin. What am I?", a: "A mirror reflection" },
+    { q: "The Endless Staircase — I rise without steps, I fall without breaking. I’m always moving, But I stay in one place. What am I?", a: "A river" },
+    { q: "The Weightless Holder — I can carry a ton, Yet weigh nothing at all. The more you put in me, The lighter I become. What am I?", a: "A hole" },
+    { q: "The Puzzle Without Pieces — I have no corners, No edges to find. I can trap you for hours, All inside your mind. What am I?", a: "A riddle" },
+    { q: "The Whisper in Stone — I am ancient, Yet I speak without age. My voice is loudest When you stand far away. What am I?", a: "A whispering gallery / echoing canyon" }
+];
 
-    function updateTimer() {
+let currentIndex = 0;
+let timeLeft = 240;
+let timer;
+
+function startGame() {
+    currentIndex = 0;
+    showRiddle();
+}
+
+function showRiddle() {
+    timeLeft = 240;
+    const riddle = riddles[currentIndex];
+    document.getElementById("game-screen").innerHTML = `
+        <p id="riddle-text">${riddle.q}</p>
+        <p id="timer">Time left: 4:00</p>
+        <button onclick="revealAnswer()">Reveal Answer</button>
+        <p id="answer" class="hidden">${riddle.a}</p>
+    `;
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => {
         let minutes = Math.floor(timeLeft / 60);
         let seconds = timeLeft % 60;
-        timerElement.textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-        if (timeLeft > 0) {
-            timeLeft--;
-            setTimeout(updateTimer, 1000);
+        document.getElementById("timer").textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            revealAnswer();
         }
-    }
+        timeLeft--;
+    }, 1000);
+}
 
-    function revealAnswer() {
-        document.getElementById("answer").classList.remove("hidden");
+function revealAnswer() {
+    document.getElementById("answer").classList.remove("hidden");
+    clearInterval(timer);
+    if (currentIndex < riddles.length - 1) {
+        document.getElementById("game-screen").innerHTML += `<br><button onclick="nextRiddle()">Next Riddle</button>`;
+    } else {
+        document.getElementById("game-screen").innerHTML += `<br><button onclick="startGame()">Play Again</button>`;
     }
+}
 
-    updateTimer();
+function nextRiddle() {
+    currentIndex++;
+    showRiddle();
+}
 </script>
 
 </body>
