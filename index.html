@@ -1,134 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>80s Riddle Challenge</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-    body {
-        margin: 0;
-        font-family: 'Press Start 2P', cursive;
-        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-        color: #00ffff;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    #game-container {
-        background: rgba(0, 0, 0, 0.8);
-        border: 3px solid #00ffff;
-        border-radius: 10px;
-        padding: 20px;
-        max-width: 600px;
-        width: 90%;
-        box-shadow: 0 0 20px #00ffff;
-    }
-    h1 {
-        font-size: 1.5em;
-        color: #ff00ff;
-        text-shadow: 0 0 10px #ff00ff;
-    }
-    p {
-        font-size: 0.9em;
-        color: white;
-    }
-    .btn {
-        background: #00ffff;
-        color: black;
-        padding: 10px 20px;
-        margin-top: 20px;
-        border: none;
-        font-family: 'Press Start 2P', cursive;
-        cursor: pointer;
-        box-shadow: 0 0 10px #00ffff;
-    }
-    .btn:hover {
-        background: #ff00ff;
-        color: white;
-        box-shadow: 0 0 15px #ff00ff;
-    }
-    #timer {
-        font-size: 1.2em;
-        margin-top: 15px;
-        color: #ff00ff;
-    }
+  :root{
+    --neon-pink:#ff00ff;
+    --neon-cyan:#00ffff;
+    --ink:#ffffff;
+    --bg1:#0f1020;
+    --bg2:#2c2a5a;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:'Press Start 2P', cursive;
+    background: radial-gradient(1200px 600px at 50% -10%, rgba(255,0,255,.15), transparent 60%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    overflow:hidden;
+  }
+
+  /* subtle scanline / VHS vibe */
+  .scanlines::before{
+    content:"";
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(
+      to bottom, rgba(255,255,255,.04), rgba(255,255,255,.04) 1px,
+      transparent 1px, transparent 3px
+    );
+    pointer-events:none;
+    mix-blend-mode:soft-light;
+  }
+
+  /* container */
+  #game{
+    width:min(900px, 100%);
+    max-height: 100%;
+    background: rgba(0,0,0,.6);
+    border:3px solid var(--neon-cyan);
+    border-radius:12px;
+    padding:20px;
+    box-shadow: 0 0 24px var(--neon-cyan);
+    text-align:center;
+  }
+
+  h1{
+    margin:0 0 12px;
+    font-size: clamp(18px, 4.5vw, 28px);
+    letter-spacing:1px;
+    color:var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink), 0 0 24px var(--neon-cyan);
+  }
+
+  #riddle{
+    margin:14px 0;
+    padding:12px;
+    line-height:1.6;
+    font-size: clamp(12px, 3.8vw, 18px);
+    color:#eafcff;
+    white-space: pre-line; /* show line breaks from JS */
+  }
+
+  #answer{
+    margin:12px 0 0;
+    padding:12px;
+    border-top:2px dashed rgba(255,255,255,.18);
+    color:#fff7a1;
+    font-size: clamp(12px, 3.6vw, 18px);
+    display:none;
+  }
+
+  #timer{
+    margin:10px 0 2px;
+    font-size: clamp(12px, 4vw, 18px);
+    color:var(--neon-cyan);
+    text-shadow:0 0 8px var(--neon-cyan);
+  }
+
+  .btn{
+    display:inline-block;
+    width:100%;
+    max-width:520px;
+    margin:10px auto 0;
+    padding:14px 18px;
+    border:0;
+    border-radius:10px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+    color:#061018;
+    box-shadow: 0 0 16px var(--neon-cyan), inset 0 0 8px rgba(255,255,255,.35);
+    cursor:pointer;
+    font-family:'Press Start 2P', cursive;
+    font-size: clamp(12px, 4vw, 16px);
+    letter-spacing:.5px;
+    transition: transform .06s ease, filter .06s ease;
+  }
+  .btn:active{ transform: scale(.98); filter:brightness(1.1); }
+  .row{ display:flex; flex-direction:column; gap:8px; align-items:center }
+
+  /* synth grid footer */
+  .grid{
+    position:fixed; left:0; right:0; bottom:-60px; height:40vh; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,255,255,.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,0,255,.45) 1px, transparent 1px);
+    background-size: 40px 40px, 40px 40px;
+    transform: perspective(500px) rotateX(65deg);
+    animation: slide 3s linear infinite;
+    opacity:.35;
+    filter: drop-shadow(0 0 10px var(--neon-cyan));
+  }
+  @keyframes slide {
+    to { background-position: 0 40px, 40px 0; }
+  }
 </style>
 </head>
-<body>
+<body class="scanlines">
 
-<div id="game-container">
+  <div id="game" role="main" aria-live="polite">
     <h1>80s Riddle Challenge</h1>
-    <div id="content">
-        <button class="btn" onclick="startGame()">Play Now</button>
+    <div id="screen" class="row">
+      <!-- Start screen injected here -->
+      <button class="btn" id="startBtn">Play Now</button>
     </div>
-</div>
+  </div>
+  <div class="grid"></div>
 
 <script>
-const riddles = [
-    { q: "I rise without steps, I fall without breaking. I’m always moving, but I stay in one place. What am I?", a: "An escalator" },
-    { q: "The more you take, the more you leave behind. What am I?", a: "Footsteps" },
-    { q: "What has keys but can’t open locks?", a: "A piano" },
-    { q: "I speak without a mouth and hear without ears. What am I?", a: "An echo" }
-];
+  /* ======= Easy settings ======= */
+  const TIMER_SECONDS = 240; // 4 minutes – change this to adjust the timer
+  /* ============================= */
 
-let currentRiddle = 0;
-let timerInterval;
-let timeLeft = 240; // 4 minutes in seconds
-
-function startGame() {
-    currentRiddle = 0;
-    showRiddle();
-}
-
-function showRiddle() {
-    timeLeft = 240;
-    document.getElementById("content").innerHTML = `
-        <p>${riddles[currentRiddle].q}</p>
-        <div id="timer">Time left: 4:00</div>
-        <button class="btn" onclick="revealAnswer()">Reveal Answer</button>
-    `;
-    startTimer();
-}
-
-function startTimer() {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            revealAnswer();
-        }
-        let minutes = Math.floor(timeLeft / 60);
-        let seconds = timeLeft % 60;
-        document.getElementById("timer").innerText = 
-            `Time left: ${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-    }, 1000);
-}
-
-function revealAnswer() {
-    clearInterval(timerInterval);
-    document.getElementById("content").innerHTML = `
-        <p>${riddles[currentRiddle].q}</p>
-        <p style="color: yellow;">Answer: ${riddles[currentRiddle].a}</p>
-        <button class="btn" onclick="nextRiddle()">Next Riddle</button>
-    `;
-}
-
-function nextRiddle() {
-    currentRiddle++;
-    if (currentRiddle >= riddles.length) {
-        document.getElementById("content").innerHTML = `
-            <p>All riddles completed! 🎉</p>
-            <button class="btn" onclick="startGame()">Play Again</button>
-        `;
-    } else {
-        showRiddle();
+  // Your 10 riddles (exact text & answers you provided)
+  const RIDDLES = [
+    {
+      q: "The Keeper of No Keys\nI have many rooms, but no doors.\nYou can enter, but never leave.\nMy walls are invisible,\nAnd my guests are always light.\nWhat am I?",
+      a: "A camera (film/sensor capturing light)"
+    },
+    {
+      q: "The Silent Messenger\nI speak without a mouth,\nAnd hear without ears.\nI have no body,\nBut I come alive with wind.\nWhat am I?",
+      a: "An echo"
+    },
+    {
+      q: "The Timeless Traveler\nI move without legs,\nI count without numbers,\nI end without dying,\nAnd I start without being born.\nWhat am I?",
+      a: "Time"
+    },
+    {
+      q: "The Forever Prison\nI’m built without bricks,\nGuarded without guards.\nThe moment you enter me,\nYou’re already gone.\nWhat am I?",
+      a: "The past"
+    },
+    {
+      q: "The Hunger with No Stomach\nI consume all I touch —\nYet never eat a bite.\nI can grow without water,\nAnd die without air.\nWhat am I?",
+      a: "Fire"
+    },
+    {
+      q: "The Twin of Opposites\nI am your reflection,\nBut not your twin.\nI do what you do,\nBut backwards and thin.\nWhat am I?",
+      a: "A mirror reflection"
+    },
+    {
+      q: "The Endless Staircase\nI rise without steps,\nI fall without breaking.\nI’m always moving,\nBut I stay in one place.\nWhat am I?",
+      a: "A river"
+    },
+    {
+      q: "The Weightless Holder\nI can carry a ton,\nYet weigh nothing at all.\nThe more you put in me,\nThe lighter I become.\nWhat am I?",
+      a: "A hole"
+    },
+    {
+      q: "The Puzzle Without Pieces\nI have no corners,\nNo edges to find.\nI can trap you for hours,\nAll inside your mind.\nWhat am I?",
+      a: "A riddle"
+    },
+    {
+      q: "The Whisper in Stone\nI am ancient,\nYet I speak without age.\nMy voice is loudest\nWhen you stand far away.\nWhat am I?",
+      a: "A whispering gallery / echoing canyon"
     }
-}
-</script>
+  ];
 
+  // Elements
+  const screenEl = document.getElementById('screen');
+
+  // State
+  let idx = 0;
+  let timeLeft = TIMER_SECONDS;
+  let tick = null;
+  let answerShown = false;
+
+  // Simple 8-bit style beeps (no audio files)
+  function beep(freq=880, ms=120, vol=0.05){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(()=>{ o.stop(); ctx.close(); }, ms);
+    }catch(e){/* ignore if autoplay blocked */}
+  }
+
+  function startGame(){
+    idx = 0;
+    showRiddle();
+  }
+
+  function showRiddle(){
+    clearInterval(tick);
+    answerShown = false;
+    timeLeft = TIMER_SECONDS;
+
+    const { q, a } = RIDDLES[idx];
+
+    screenEl.innerHTML = `
+      <div id="riddle" aria-live="polite">${q}</div>
+      <div id="timer">Time left: ${fmt(timeLeft)}</div>
+      <button class="btn" id="revealBtn">Reveal Answer</button>
+      <div id="answer">Answer: ${a}</div>
+    `;
+
+    document.getElementById('answer').style.display = 'none';
+
+    document.getElementById('revealBtn').addEventListener('click', revealAnswer);
+
+    // start timer
+    beep(760, 110); // tiny start beep
+    tick = setInterval(()=>{
+      timeLeft--;
+      const t = document.getElementById('timer');
+      if(t) t.textContent = `Time left: ${fmt(timeLeft)}`;
+      if(timeLeft <= 0){
+        clearInterval(tick);
+        revealAnswer(); // auto-reveal
+      }
+    }, 1000);
+  }
+
+  function revealAnswer(){
+    if(answerShown) return;
+    answerShown = true;
+    clearInterval(tick);
+    beep(420, 140); // reveal beep
+
+    const ans = document.getElementById('answer');
+    ans.style.display = 'block';
+
+    // Swap the button to Next / Play Again
+    const controls = document.createElement('div');
+    controls.className = 'row';
+    const isLast = idx === RIDDLES.length - 1;
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn';
+    nextBtn.textContent = isLast ? 'Play Again' : 'Next Riddle';
+    nextBtn.addEventListener('click', ()=>{
+      if(isLast){
+        startGame();
+      }else{
+        idx++;
+        showRiddle();
+      }
+    });
+
+    controls.appendChild(nextBtn);
+    screenEl.appendChild(controls);
+  }
+
+  function fmt(s){
+    const m = Math.floor(s/60);
+    const sec = String(s%60).padStart(2,'0');
+    return `${m}:${sec}`;
+  }
+
+  // Wire up start button (first load)
+  document.getElementById('startBtn').addEventListener('click', startGame);
+</script>
 </body>
 </html>
