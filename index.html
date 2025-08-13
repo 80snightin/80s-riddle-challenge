@@ -1,177 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>80s Riddle Challenge</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        body {
-            margin: 0;
-            font-family: 'Press Start 2P', cursive;
-            background: linear-gradient(135deg, #2d005f, #ff00a5);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-
-        #riddle-box {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border: 3px solid #ff00ff;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 90%;
-            box-shadow: 0 0 20px #ff00ff;
-        }
-
-        .title {
-            font-size: 1.5em;
-            text-shadow: 0 0 8px #00f0ff, 0 0 20px #ff00ff;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background: #ff00ff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-family: 'Press Start 2P', cursive;
-            margin-top: 10px;
-            cursor: pointer;
-            text-shadow: 0 0 5px black;
-            box-shadow: 0 0 10px #ff00ff;
-        }
-
-        button:hover {
-            background: #00f0ff;
-            box-shadow: 0 0 15px #00f0ff;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .retro-icons .icon {
-            position: absolute;
-            width: 50px;
-            height: auto;
-        }
-
-        .top-left { top: 10px; left: 10px; }
-        .top-right { top: 10px; right: 10px; }
-        .bottom-left { bottom: 10px; left: 10px; }
-        .bottom-right { bottom: 10px; right: 10px; }
-
-        .grid-floor {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background-image:
-                linear-gradient(#ff00ff 1px, transparent 1px),
-                linear-gradient(90deg, #ff00ff 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: gridMove 4s linear infinite;
-            transform: perspective(500px) rotateX(60deg);
-        }
-
-        @keyframes gridMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 40px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>80s Riddle Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Press Start 2P', cursive;
+        background: linear-gradient(135deg, #2d005f, #ff00a5);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
+    #riddle-box {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 20px;
+        border: 3px solid #ff00ff;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 90%;
+        box-shadow: 0 0 20px #ff00ff;
+    }
+    .title {
+        font-size: 1.2em;
+        text-shadow: 0 0 8px #00f0ff, 0 0 20px #ff00ff;
+        margin-bottom: 20px;
+    }
+    button {
+        background: #ff00ff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-family: 'Press Start 2P', cursive;
+        margin-top: 10px;
+        cursor: pointer;
+        text-shadow: 0 0 5px black;
+        box-shadow: 0 0 10px #ff00ff;
+    }
+    button:hover {
+        background: #00f0ff;
+        box-shadow: 0 0 15px #00f0ff;
+    }
+    .hidden {
+        display: none;
+    }
+    /* Retro corner icons */
+    .retro-icon {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+    }
+    .top-left { top: 10px; left: 10px; }
+    .top-right { top: 10px; right: 10px; }
+    .bottom-left { bottom: 10px; left: 10px; }
+    .bottom-right { bottom: 10px; right: 10px; }
+    /* 80s grid floor animation */
+    .grid-floor {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 200px;
+        background: repeating-linear-gradient(
+            to right,
+            rgba(255, 0, 255, 0.4) 0px,
+            rgba(255, 0, 255, 0.4) 2px,
+            transparent 2px,
+            transparent 40px
+        ),
+        repeating-linear-gradient(
+            to top,
+            rgba(0, 255, 255, 0.4) 0px,
+            rgba(0, 255, 255, 0.4) 2px,
+            transparent 2px,
+            transparent 40px
+        );
+        transform: perspective(300px) rotateX(60deg);
+        animation: moveGrid 2s linear infinite;
+    }
+    @keyframes moveGrid {
+        from { background-position: 0 0, 0 0; }
+        to { background-position: 40px 40px, 0 40px; }
+    }
+</style>
 </head>
 <body>
 
-    <div class="retro-icons">
-        <img src="https://i.imgur.com/nHw1C1T.png" class="icon top-left" alt="Cassette">
-        <img src="https://i.imgur.com/uhYdyeF.png" class="icon top-right" alt="Rubik’s Cube">
-        <img src="https://i.imgur.com/TUuYzT2.png" class="icon bottom-left" alt="Joystick">
-        <img src="https://i.imgur.com/ZPw1dNe.png" class="icon bottom-right" alt="Cassette Tape">
-    </div>
+<!-- Retro icons in corners -->
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Cassette_tape_icon.svg" class="retro-icon top-left" alt="Cassette">
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Rubik%27s_cube_icon.svg" class="retro-icon top-right" alt="Rubik's Cube">
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Joystick_icon.svg" class="retro-icon bottom-left" alt="Joystick">
+<img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Floppy_disk_icon.svg" class="retro-icon bottom-right" alt="Floppy Disk">
 
-    <div class="container">
-        <h1 class="title">80s Riddle Challenge</h1>
-        <div id="riddle-box">
-            <p id="riddle-text"></p>
-            <p id="timer"></p>
-            <button id="reveal-btn">Reveal Answer</button>
-            <p id="answer-text" class="hidden"></p>
-            <button id="next-btn" class="hidden">Next Riddle</button>
-        </div>
-    </div>
+<div id="riddle-box">
+    <div class="title">80s Riddle Challenge</div>
+    <p id="riddle-text">The Endless Staircase — I rise without steps, I fall without breaking. I’m always moving, but I stay in one place. What am I?</p>
+    <p id="timer">Time left: 4:00</p>
+    <button onclick="revealAnswer()">Reveal Answer</button>
+    <p id="answer" class="hidden">An escalator!</p>
+</div>
 
-    <div class="grid-floor"></div>
+<div class="grid-floor"></div>
 
-    <script>
-        const riddles = [
-            { question: "The Keeper of No Keys\nI have many rooms, but no doors...\nWhat am I?", answer: "A camera" },
-            { question: "The Silent Messenger\nI speak without a mouth...\nWhat am I?", answer: "An echo" },
-            { question: "The Timeless Traveler\nI move without legs...\nWhat am I?", answer: "Time" },
-            { question: "The Forever Prison\nI’m built without bricks...\nWhat am I?", answer: "The past" },
-            { question: "The Hunger with No Stomach\nI consume all I touch...\nWhat am I?", answer: "Fire" },
-            { question: "The Twin of Opposites\nI am your reflection...\nWhat am I?", answer: "A mirror reflection" },
-            { question: "The Endless Staircase\nI rise without steps...\nWhat am I?", answer: "A river" },
-            { question: "The Weightless Holder\nI can carry a ton...\nWhat am I?", answer: "A hole" },
-            { question: "The Puzzle Without Pieces\nI have no corners...\nWhat am I?", answer: "A riddle" },
-            { question: "The Whisper in Stone\nI am ancient...\nWhat am I?", answer: "A whispering gallery / echoing canyon" }
-        ];
+<script>
+    let timeLeft = 240;
+    const timerElement = document.getElementById("timer");
 
-        let currentIndex = 0;
-        let timer;
-        let timeLeft = 240;
-
-        const riddleText = document.getElementById("riddle-text");
-        const answerText = document.getElementById("answer-text");
-        const timerDisplay = document.getElementById("timer");
-        const revealBtn = document.getElementById("reveal-btn");
-        const nextBtn = document.getElementById("next-btn");
-
-        function startRiddle() {
-            riddleText.textContent = riddles[currentIndex].question;
-            answerText.textContent = riddles[currentIndex].answer;
-            answerText.classList.add("hidden");
-            nextBtn.classList.add("hidden");
-            timeLeft = 240;
-            updateTimer();
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimer();
-                if (timeLeft <= 0) {
-                    revealAnswer();
-                }
-            }, 1000);
+    function updateTimer() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerElement.textContent = `Time left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
         }
+    }
 
-        function updateTimer() {
-            timerDisplay.textContent = `Time left: ${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`;
-        }
+    function revealAnswer() {
+        document.getElementById("answer").classList.remove("hidden");
+    }
 
-        function revealAnswer() {
-            clearInterval(timer);
-            answerText.classList.remove("hidden");
-            nextBtn.classList.remove("hidden");
-        }
+    updateTimer();
+</script>
 
-        revealBtn.addEventListener("click", revealAnswer);
-
-        nextBtn.addEventListener("click", () => {
-            currentIndex++;
-            if (currentIndex >= riddles.length) {
-                currentIndex = 0;
-            }
-            startRiddle();
-        });
-
-        startRiddle();
-    </script>
 </body>
 </html>
