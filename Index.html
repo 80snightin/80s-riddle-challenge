@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>80s Riddle Challenge</title>
+
+  <!-- Retro / pixel fonts via Google Fonts (optional when online) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1: #130528;
+      --bg2: #240b36;
+      --neon-pink: #ff38a4;
+      --neon-blue: #39d5ff;
+      --neon-purple: #a16eff;
+      --neon-yellow: #fff35c;
+      --white: #f5f7ff;
+      --timer: 240; /* seconds per riddle: easily adjustable */
+      --pad: clamp(12px, 3vw, 24px);
+      --radius: 14px;
+      --maxw: 900px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: radial-gradient(circle at 20% 20%, #29184a, var(--bg1) 60%) fixed;
+      color: var(--white);
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* VHS static layered background */
+    .vhs-noise::before,
+    .vhs-noise::after {
+      content: "";
+      position: fixed;
+      left: 0; top: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      opacity: .08;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.15) 0 1px, transparent 1px 3px);
+      animation: scanlines 6s linear infinite;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+    .vhs-noise::after {
+      opacity: .06;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,56,164,.12), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(57,213,255,.12), transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(161,110,255,.12), transparent 45%);
+      filter: blur(1px);
+      animation: hue 14s linear infinite;
+    }
+    @keyframes scanlines { to { transform: translateY(3px);} }
+    @keyframes hue { 0%{ filter: hue-rotate(0deg);} 100%{ filter: hue-rotate(360deg);} }
+
+    /* Neon grid horizon */
+    .grid {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(transparent 60%, rgba(255,56,164,.12) 61%),
+        repeating-linear-gradient(to right, rgba(57,213,255,.12) 0 2px, transparent 2px 80px),
+        repeating-linear-gradient(to top, rgba(57,213,255,.12) 0 2px, transparent 2px 80px);
+      background-size: 100% 100%, 100% 100%, 100% 100%;
+      transform: perspective(800px) rotateX(65deg) translateY(35%);
+      transform-origin: bottom;
+      filter: drop-shadow(0 0 12px rgba(57,213,255,.6));
+    }
+
+    /* Layout */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: calc(var(--pad) * 2) var(--pad) 120px;
+    }
+    .shell {
+      width: min(100%, var(--maxw));
+      background: linear-gradient(145deg, rgba(19,5,40,.75), rgba(36,11,54,.75));
+      backdrop-filter: blur(6px) saturate(120%);
+      border-radius: var(--radius);
+      border: 2px solid rgba(161,110,255,.35);
+      box-shadow:
+        0 0 0 2px rgba(57,213,255,.15) inset,
+        0 0 35px rgba(161,110,255,.35),
+        0 0 60px rgba(57,213,255,.25);
+      padding: clamp(16px, 4vw, 40px);
+    }
+
+    h1, h2, .title-font { font-family: "Orbitron", system-ui, sans-serif; letter-spacing: 1px; }
+    .pixel { font-family: "Press Start 2P", monospace; }
+    p, button, .riddle-text { font-family: "Orbitron", system-ui, sans-serif; }
+
+    h1 {
+      font-size: clamp(26px, 6vw, 58px);
+      text-align: center;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      color: var(--white);
+      text-shadow:
+        0 0 10px var(--neon-pink),
+        0 0 20px var(--neon-blue),
+        0 0 40px var(--neon-purple);
+    }
+
+    .sub {
+      text-align: center;
+      font-size: clamp(12px, 3.2vw, 16px);
+      opacity: .9;
+      margin-bottom: 24px;
+    }
+
+    /* Buttons */
+    .btn {
+      --glow: var(--neon-pink);
+      display: inline-block;
+      border: 2px solid var(--glow);
+      padding: 16px 22px;
+      border-radius: 12px;
+      font-size: clamp(16px, 4.8vw, 22px);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: var(--white);
+      background:
+        radial-gradient(80% 80% at 50% 20%, color-mix(in hsl, var(--glow) 24%, transparent) 0%, transparent 70%),
+        linear-gradient(145deg, rgba(255,255,255,.08), rgba(0,0,0,.25));
+      box-shadow:
+        0 0 12px color-mix(in hsl, var(--glow) 60%, transparent),
+        inset 0 0 18px color-mix(in hsl, var(--glow) 25%, transparent);
+      transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      width: 100%;
+    }
+    .btn:active {
+      transform: scale(.98);
+      filter: brightness(1.08);
+    }
+    .btn:hover, .btn:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 16px color-mix(in hsl, var(--glow) 75%, transparent),
+        0 0 50px color-mix(in hsl, var(--glow) 35%, transparent),
+        inset 0 0 26px color-mix(in hsl, var(--glow) 35%, transparent);
+    }
+    .btn.blue { --glow: var(--neon-blue); }
+    .btn.purple { --glow: var(--neon-purple); }
+    .btn.yellow { --glow: var(--neon-yellow); color: #1a1333; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+
+    .row { display: grid; gap: 14px; }
+
+    /* Game area */
+    .panel {
+      display: none;
+      gap: 18px;
+    }
+    .panel.active { display: grid; }
+
+    .riddle-title {
+      font-size: clamp(14px, 3.2vw, 18px);
+      opacity: .9;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .riddle-text {
+      font-size: clamp(18px, 5vw, 28px);
+      line-height: 1.25;
+      text-align: center;
+      text-shadow:
+        0 0 12px rgba(255,56,164,.2),
+        0 0 22px rgba(57,213,255,.2);
+    }
+    .answer {
+      display: none;
+      font-size: clamp(18px, 5vw, 28px);
+      text-align: center;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(161,110,255,.15), rgba(57,213,255,.12));
+      border: 1px dashed rgba(161,110,255,.5);
+      box-shadow: inset 0 0 18px rgba(57,213,255,.22);
+    }
+    .answer.show { display: block; }
+
+    .timer {
+      display: grid;
+      place-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 2px solid rgba(57,213,255,.55);
+      background: radial-gradient(120% 120% at 50% 0%, rgba(57,213,255,.11), rgba(255,56,164,.08));
+      box-shadow: 0 0 20px rgba(57,213,255,.25) inset;
+      margin: 6px auto 10px;
+      width: min(420px, 100%);
+    }
+    .timer .label { font-size: clamp(12px, 3vw, 14px); opacity: .85; }
+    .timer .time {
+      font-family: "Press Start 2P", monospace;
+      font-size: clamp(20px, 6.2vw, 34px);
+      text-shadow:
+        0 0 12px var(--neon-blue),
+        0 0 22px var(--neon-purple);
+      letter-spacing: 1px;
+    }
+    progress {
+      width: 100%;
+      height: 14px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    progress::-webkit-progress-bar {
+      background: rgba(255,255,255,.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    progress::-webkit-progress-value {
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(57,213,255,.6);
+    }
+    progress::-moz-progress-bar {
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+      border-radius: 10px;
+    }
+
+    /* Corner 80s icons */
+    .icons {
+      pointer-events: none;
+      position: fixed; inset: 0; z-index: 2;
+    }
+    .icon {
+      position: absolute; width: clamp(40px, 14vw, 80px); opacity: .9;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,.4)) drop-shadow(0 0 14px rgba(161,110,255,.45));
+      animation: floaty 6s ease-in-out infinite;
+    }
+    .icons svg { width: 100%; height: auto; }
+    .icon.tl { top: 10px; left: 10px; animation-delay: 0s; }
+    .icon.tr { top: 10px; right: 10px; animation-delay: .6s;}
+    .icon.bl { bottom: 10px; left: 10px; animation-delay: 1.2s;}
+    .icon.br { bottom: 10px; right: 10px; animation-delay: 1.8s;}
+    @keyframes floaty {
+      0%,100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-6px) rotate(2deg); }
+    }
+
+    /* Footer note */
+    .foot {
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: .7;
+      text-align: center;
+    }
+
+    /* Accessibility prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .vhs-noise::before, .vhs-noise::after, .icon, .grid { animation: none !important; }
+    }
+
+    /* Small handset tweaks */
+    @media (max-width: 380px) {
+      .btn { padding: 14px 16px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body class="vhs-noise">
+
+  <!-- Neon grid horizon -->
+  <div class="grid" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <main class="shell" role="main">
+      <!-- HOME -->
+      <section id="home" class="panel active" aria-labelledby="title">
+        <h1 id="title" class="pixel">80s Riddle Challenge</h1>
+        <p class="sub">Scan &amp; play on your phone. Neon riddles, synth vibes, 4 minutes each.</p>
+        <div class="row">
+          <button id="startBtn" class="btn purple" aria-controls="game">Start Game</button>
+        </div>
+      </section>
+
+      <!-- GAME -->
+      <section id="game" class="panel" aria-live="polite" aria-atomic="true">
+        <div class="riddle-meta riddle-title" id="riddleTitle"></div>
+        <div class="riddle-text pixel" id="riddleText"></div>
+
+        <div class="timer" role="group" aria-label="Countdown timer">
+          <div class="label">Time Remaining</div>
+          <div class="time" id="timeDisplay">04:00</div>
+          <progress id="timeProgress" max="1" value="1" aria-hidden="true"></progress>
+        </div>
+
+        <div class="row">
+          <button id="revealBtn" class="btn blue">Reveal Answer</button>
+          <div id="answerBox" class="answer"></div>
+          <button id="nextBtn" class="btn yellow" hidden>Next Riddle</button>
+          <button id="againBtn" class="btn purple" hidden>Play Again</button>
+        </div>
+        <p class="foot">Tip: Long-press buttons on mobile for extra glow ✨</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Decorative 80s corner icons: cassette, rubik, joystick -->
+  <div class="icons" aria-hidden="true">
+    <!-- Cassette (top-left) -->
+    <div class="icon tl">
+      <svg viewBox="0 0 128 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="4" y="8" width="120" height="48" rx="6" stroke="#39d5ff" stroke-width="3" fill="rgba(57,213,255,.08)"/>
+        <rect x="20" y="24" width="88" height="16" rx="3" stroke="#ff38a4" stroke-width="2"/>
+        <circle cx="40" cy="32" r="6" stroke="#fff35c" stroke-width="3"/>
+        <circle cx="88" cy="32" r="6" stroke="#fff35c" stroke-width="3"/>
+        <rect x="12" y="14" width="20" height="6" fill="#a16eff"/>
+        <rect x="96" y="14" width="20" height="6" fill="#a16eff"/>
+      </svg>
+    </div>
+
+    <!-- Rubik's Cube (top-right) -->
+    <div class="icon tr">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g stroke="#a16eff" stroke-width="2" fill="none">
+          <rect x="6" y="6" width="52" height="52" rx="6"/>
+          <path d="M6 27h52M6 37h52M6 17h52M27 6v52M37 6v52M17 6v52"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Arcade Joystick (bottom-right) -->
+    <div class="icon br">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="20" r="10" fill="#ff38a4" stroke="#39d5ff" stroke-width="2"/>
+        <rect x="18" y="40" width="44" height="14" rx="5" fill="rgba(57,213,255,.1)" stroke="#39d5ff" stroke-width="2"/>
+        <rect x="14" y="54" width="52" height="10" rx="5" fill="rgba(161,110,255,.15)" stroke="#a16eff" stroke-width="2"/>
+        <line x1="40" y1="20" x2="40" y2="38" stroke="#fff35c" stroke-width="3"/>
+      </svg>
+    </div>
+
+    <!-- Joystick shadow buddy (bottom-left) -->
+    <div class="icon bl">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="20" r="10" fill="#39d5ff" stroke="#a16eff" stroke-width="2"/>
+        <rect x="18" y="40" width="44" height="14" rx="5" fill="rgba(161,110,255,.12)" stroke="#a16eff" stroke-width="2"/>
+        <rect x="14" y="54" width="52" height="10" rx="5" fill="rgba(57,213,255,.12)" stroke="#39d5ff" stroke-width="2"/>
+        <line x1="40" y1="20" x2="40" y2="38" stroke="#fff35c" stroke-width="3"/>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    // ------- CONFIG (easy to edit) --------
+    const SECONDS_PER_RIDDLE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--timer')) || 240;
+
+    // Riddles: title, lines (array or string), answer
+    const RIDDLES = [
+      {
+        title: "The Keeper of No Keys",
+        text: `I have many rooms, but no doors.
+You can enter, but never leave.
+My walls are invisible,
+And my guests are always light.
+What am I?`,
+        answer: "A camera (film/sensor capturing light)"
+      },
+      {
+        title: "The Silent Messenger",
+        text: `I speak without a mouth,
+And hear without ears.
+I have no body,
+But I come alive with wind.
+What am I?`,
+        answer: "An echo"
+      },
+      {
+        title: "The Timeless Traveler",
+        text: `I move without legs,
+I count without numbers,
+I end without dying,
+And I start without being born.
+What am I?`,
+        answer: "Time"
+      },
+      {
+        title: "The Forever Prison",
+        text: `I’m built without bricks,
+Guarded without guards.
+The moment you enter me,
+You’re already gone.
+What am I?`,
+        answer: "The past"
+      },
+      {
+        title: "The Hunger with No Stomach",
+        text: `I consume all I touch —
+Yet never eat a bite.
+I can grow without water,
+And die without air.
+What am I?`,
+        answer: "Fire"
+      },
+      {
+        title: "The Twin of Opposites",
+        text: `I am your reflection,
+But not your twin.
+I do what you do,
+But backwards and thin.
+What am I?`,
+        answer: "A mirror reflection"
+      },
+      {
+        title: "The Endless Staircase",
+        text: `I rise without steps,
+I fall without breaking.
+I’m always moving,
+But I stay in one place.
+What am I?`,
+        answer: "A river"
+      },
+      {
+        title: "The Weightless Holder",
+        text: `I can carry a ton,
+Yet weigh nothing at all.
+The more you put in me,
+The lighter I become.
+What am I?`,
+        answer: "A hole"
+      },
+      {
+        title: "The Puzzle Without Pieces",
+        text: `I have no corners,
+No edges to find.
+I can trap you for hours,
+All inside your mind.
+What am I?`,
+        answer: "A riddle"
+      },
+      {
+        title: "The Whisper in Stone",
+        text: `I am ancient,
+Yet I speak without age.
+My voice is loudest
+When you stand far away.
+What am I?`,
+        answer: "A whispering gallery / echoing canyon"
+      }
+    ];
+
+    // ------- State --------
+    let idx = 0;
+    let remaining = SECONDS_PER_RIDDLE;
+    let ticker = null;
+    let answerShown = false;
+
+    // ------- Elements --------
+    const home = document.getElementById('home');
+    const game = document.getElementById('game');
+    const startBtn = document.getElementById('startBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const againBtn = document.getElementById('againBtn');
+    const riddleTitle = document.getElementById('riddleTitle');
+    const riddleText = document.getElementById('riddleText');
+    const answerBox = document.getElementById('answerBox');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const timeProgress = document.getElementById('timeProgress');
+
+    // ------- Audio: 8-bit style beeps using Web Audio --------
+    let audioCtx;
+    function beep({freq=880, duration=0.12, type='square', gain=0.03, slideTo, endGain=0.0}={}) {
+      try {
+        if (!audioCtx) {
+          const A = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new A();
+        }
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        g.gain.value = gain;
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (slideTo) {
+          osc.frequency.exponentialRampToValueAtTime(slideTo, now + duration);
+        }
+        g.gain.setValueAtTime(gain, now);
+        g.gain.exponentialRampToValueAtTime(Math.max(0.0001, endGain), now + duration);
+        osc.start();
+        osc.stop(now + duration + 0.02);
+      } catch(e) {
+        // ignore if user gesture policy blocks autoplay
+      }
+    }
+    function sfxStart() { beep({freq: 620, duration: .09}); beep({freq: 1240, duration: .09}); }
+    function sfxReveal() { beep({freq: 180, duration: .12}); beep({freq: 360, duration: .12}); beep({freq: 720, duration: .12}); }
+
+    // ------- Utils --------
+    const fmt = (s)=> {
+      const m = Math.floor(s/60).toString().padStart(2,'0');
+      const n = Math.floor(s%60).toString().padStart(2,'0');
+      return `${m}:${n}`;
+    };
+
+    function swap(showGame) {
+      home.classList.toggle('active', !showGame);
+      game.classList.toggle('active', showGame);
+    }
+
+    function showRiddle(i){
+      const R = RIDDLES[i];
+      riddleTitle.textContent = `${i+1} / ${RIDDLES.length} — ${R.title}`;
+      riddleText.textContent = R.text;
+      answerBox.textContent = R.answer;
+      answerBox.classList.remove('show');
+      revealBtn.disabled = false;
+      nextBtn.hidden = true;
+      againBtn.hidden = true;
+      answerShown = false;
+      resetTimer();
+      startTimer();
+      sfxStart();
+    }
+
+    function resetTimer(){
+      stopTimer();
+      remaining = SECONDS_PER_RIDDLE;
+      updateTimerUI();
+    }
+
+    function updateTimerUI(){
+      timeDisplay.textContent = fmt(remaining);
+      timeProgress.value = Math.max(0, remaining / SECONDS_PER_RIDDLE);
+    }
+
+    function startTimer(){
+      stopTimer();
+      ticker = setInterval(()=>{
+        remaining -= 1;
+        if (remaining <= 0){
+          remaining = 0;
+          updateTimerUI();
+          revealAnswer(true);
+          stopTimer();
+        } else {
+          updateTimerUI();
+        }
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if (ticker) { clearInterval(ticker); ticker = null; }
+    }
+
+    function revealAnswer(fromTimer=false){
+      if (answerShown) return;
+      answerShown = true;
+      answerBox.classList.add('show');
+      revealBtn.disabled = true;
+      stopTimer();
+      sfxReveal();
+      if (idx < RIDDLES.length - 1) {
+        nextBtn.hidden = false;
+      } else {
+        againBtn.hidden = false;
+      }
+    }
+
+    function nextRiddle(){
+      idx = Math.min(idx + 1, RIDDLES.length - 1);
+      showRiddle(idx);
+    }
+
+    function restart(){
+      idx = 0;
+      showRiddle(idx);
+    }
+
+    // ------- Event Listeners --------
+    startBtn.addEventListener('click', ()=> {
+      swap(true);
+      restart();
+    });
+    revealBtn.addEventListener('click', ()=> revealAnswer(false));
+    nextBtn.addEventListener('click', nextRiddle);
+    againBtn.addEventListener('click', restart);
+
+    // Improve touch feedback glow
+    document.querySelectorAll('.btn').forEach(btn=>{
+      btn.addEventListener('touchstart', ()=> btn.classList.add('hover'), {passive:true});
+      btn.addEventListener('touchend', ()=> btn.classList.remove('hover'));
+    });
+
+    // Keyboard accessibility shortcuts
+    window.addEventListener('keydown', (e)=>{
+      if (!game.classList.contains('active')) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (!answerShown) revealAnswer(false);
+        else if (idx < RIDDLES.length - 1) nextRiddle();
+        else restart();
+      }
+      if (e.key.toLowerCase() === 'n' && answerShown && idx < RIDDLES.length - 1) nextRiddle();
+    });
+  </script>
+</body>
+</html>
