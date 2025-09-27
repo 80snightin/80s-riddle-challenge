@@ -1,209 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>80s Riddle Challenge</title>
+
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --neon-pink:#ff00ff;
-    --neon-cyan:#00ffff;
-    --ink:#ffffff;
-    --bg1:#0f1020;
-    --bg2:#2c2a5a;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:'Press Start 2P', cursive;
-    background: radial-gradient(1200px 600px at 50% -10%, rgba(255,0,255,.15), transparent 60%),
-                linear-gradient(135deg, var(--bg1), var(--bg2));
-    color:var(--ink);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-    overflow:hidden;
-  }
-  .scanlines::before{
-    content:"";
-    position:fixed; inset:0;
-    background: repeating-linear-gradient(
-      to bottom, rgba(255,255,255,.04), rgba(255,255,255,.04) 1px,
-      transparent 1px, transparent 3px
-    );
-    pointer-events:none;
-    mix-blend-mode:soft-light;
-  }
-  #game{
-    width:min(900px, 100%);
-    max-height: 100%;
-    background: rgba(0,0,0,.6);
-    border:3px solid var(--neon-cyan);
-    border-radius:12px;
-    padding:20px;
-    box-shadow: 0 0 24px var(--neon-cyan);
-    text-align:center;
-  }
-  h1{
-    margin:0 0 12px;
-    font-size: clamp(18px, 4.5vw, 28px);
-    letter-spacing:1px;
-    color:var(--neon-pink);
-    text-shadow: 0 0 10px var(--neon-pink), 0 0 24px var(--neon-cyan);
-  }
-  #riddle{
-    margin:14px 0;
-    padding:12px;
-    line-height:1.6;
-    font-size: clamp(12px, 3.8vw, 18px);
-    color:#eafcff;
-    white-space: pre-line;
-  }
-  #answer{
-    margin:12px 0 0;
-    padding:12px;
-    border-top:2px dashed rgba(255,255,255,.18);
-    color:#fff7a1;
-    font-size: clamp(12px, 3.6vw, 18px);
-    display:none;
-  }
-  #timer{
-    margin:10px 0 2px;
-    font-size: clamp(12px, 4vw, 18px);
-    color:var(--neon-cyan);
-    text-shadow:0 0 8px var(--neon-cyan);
-  }
-  .btn{
-    display:inline-block;
-    width:100%;
-    max-width:520px;
-    margin:10px auto 0;
-    padding:14px 18px;
-    border:0;
-    border-radius:10px;
-    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-    color:#061018;
-    box-shadow: 0 0 16px var(--neon-cyan), inset 0 0 8px rgba(255,255,255,.35);
-    cursor:pointer;
-    font-family:'Press Start 2P', cursive;
-    font-size: clamp(12px, 4vw, 16px);
-    letter-spacing:.5px;
-    transition: transform .06s ease, filter .06s ease;
-  }
-  .btn:active{ transform: scale(.98); filter:brightness(1.1); }
-  .row{ display:flex; flex-direction:column; gap:8px; align-items:center }
-  .grid{
-    position:fixed; left:0; right:0; bottom:-60px; height:40vh; pointer-events:none;
-    background-image:
-      linear-gradient(rgba(0,255,255,.5) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,0,255,.45) 1px, transparent 1px);
-    background-size: 40px 40px, 40px 40px;
-    transform: perspective(500px) rotateX(65deg);
-    animation: slide 3s linear infinite;
-    opacity:.35;
-    filter: drop-shadow(0 0 10px var(--neon-cyan));
-  }
-  @keyframes slide {
-    to { background-position: 0 40px, 40px 0; }
-  }
+/* ====== BASIC BODY ====== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Press Start 2P', cursive;
+  color: #00f7ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #0f0321 0%, #1c0433 100%);
+}
+
+/* ====== ANIMATED GRID ====== */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: linear-gradient(#3f0c6b 1px, transparent 1px),
+                    linear-gradient(90deg, #3f0c6b 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: moveGrid 10s linear infinite;
+  z-index: -1;
+}
+@keyframes moveGrid {
+  from {background-position: 0 0, 0 0;}
+  to {background-position: 40px 40px, 40px 40px;}
+}
+
+/* ====== TITLE & GAME SCREENS ====== */
+h1, h2 {
+  text-align: center;
+  color: #ff00ff;
+  text-shadow: 0 0 8px #ff00ff, 0 0 16px #ff00ff;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.title-screen, .game-screen {
+  background: rgba(0,0,0,0.6);
+  padding: 20px;
+  border: 2px solid #00f7ff;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #00f7ff;
+  max-width: 600px;
+  text-align: center;
+}
+
+button {
+  background: linear-gradient(90deg,#00f7ff,#ff00ff);
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 15px;
+  border-radius: 8px;
+  text-shadow: none;
+}
+button:hover {
+  opacity: 0.85;
+}
+
+input {
+  display: block;
+  margin: 15px auto;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #00f7ff;
+  border-radius: 8px;
+  width: 80%;
+  text-align: center;
+}
+
+.hidden {display: none;}
+#feedback {
+  margin-top: 10px;
+  font-size: 12px;
+}
 </style>
 </head>
-<body class="scanlines">
-  <div id="game" role="main" aria-live="polite">
+<body>
+  <div class="title-screen">
     <h1>80s Riddle Challenge</h1>
-    <div id="screen" class="row">
-      <button class="btn" id="startBtn">Play Now</button>
-    </div>
+    <button id="startBtn">Play Now</button>
   </div>
-  <div class="grid"></div>
+
+  <div class="game-screen hidden">
+    <h2 id="riddle-text"></h2>
+    <input type="text" id="answerInput" placeholder="Type your answer here">
+    <button id="submitBtn">Submit</button>
+    <p id="feedback"></p>
+  </div>
 
 <script>
-  const TIMER_SECONDS = 240; 
-  const RIDDLES = [
-    { q: "The Keeper of No Keys\nI have many rooms, but no doors.\nYou can enter, but never leave.\nMy walls are invisible,\nAnd my guests are always light.\nWhat am I?", a: "A camera (film/sensor capturing light)" },
-    { q: "The Silent Messenger\nI speak without a mouth,\nAnd hear without ears.\nI have no body,\nBut I come alive with wind.\nWhat am I?", a: "An echo" },
-    { q: "The Timeless Traveler\nI move without legs,\nI count without numbers,\nI end without dying,\nAnd I start without being born.\nWhat am I?", a: "Time" },
-    { q: "The Forever Prison\nI’m built without bricks,\nGuarded without guards.\nThe moment you enter me,\nYou’re already gone.\nWhat am I?", a: "The past" },
-    { q: "The Hunger with No Stomach\nI consume all I touch —\nYet never eat a bite.\nI can grow without water,\nAnd die without air.\nWhat am I?", a: "Fire" },
-    { q: "The Twin of Opposites\nI am your reflection,\nBut not your twin.\nI do what you do,\nBut backwards and thin.\nWhat am I?", a: "A mirror reflection" },
-    { q: "The Endless Staircase\nI rise without steps,\nI fall without breaking.\nI’m always moving,\nBut I stay in one place.\nWhat am I?", a: "A river" },
-    { q: "The Weightless Holder\nI can carry a ton,\nYet weigh nothing at all.\nThe more you put in me,\nThe lighter I become.\nWhat am I?", a: "A hole" },
-    { q: "The Puzzle Without Pieces\nI have no corners,\nNo edges to find.\nI can trap you for hours,\nAll inside your mind.\nWhat am I?", a: "A riddle" },
-    { q: "I’m tall when I’m young, and short when I’m old.\nWhat am I?", a: "A candle" }
-  ];
-  const screenEl = document.getElementById('screen');
-  let idx = 0, timeLeft = TIMER_SECONDS, tick = null, answerShown = false;
+/* ====== RIDDLES ====== */
+const riddles = [
+  {q:"Ask this question all day long, but always get completely different answers, and yet all the answers will be correct. What is the question?", a:"what time is it"},
+  {q:"They come out at night without being called, and are lost in the day without being stolen. What are they?", a:"stars"},
+  {q:"A man goes out for a walk during a storm with nothing to protect him from the rain. He doesn’t have a hat, a hood or an umbrella. But by the end of his walk, there isn’t a single wet hair on his head. Why doesn’t the man have wet hair?", a:"he’s bald"},
+  {q:"The one who makes me cannot use me. The one who buys me will always buy me for someone else. The one who uses me doesn't know it. What am I?", a:"a coffin"},
+  {q:"I’m tall when I’m young, and I’m short when I’m old. What am I?", a:"a candle"},
+  {q:"David’s father has 3 sons: Snap, Crackle and _____.", a:"david"},
+  {q:"You walk into a room and see a bed. On the bed, there are two dogs, five cats, a giraffe, six cows, and a goose. There are also three doves flying above the bed. How many legs are on the floor?", a:"six"},
+  {q:"I have keys but open no locks; I have space but no room; you can enter but not go inside. What am I?", a:"a keyboard"},
+  {q:"I can be long, I can be short; I can be grown, I can be bought; I can be painted, or I can be bare; I can be round or square. What am I?", a:"a nail"},
+  {q:"I keep no keys but hold a door, You push and pull and push some more. I let you in without a sound, Yet when you leave I still stay round. What am I?", a:"a doorknob"}
+];
 
-  function beep(freq=880, ms=120, vol=0.05){
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'square';
-      o.frequency.value = freq;
-      g.gain.value = vol;
-      o.connect(g); g.connect(ctx.destination);
-      o.start();
-      setTimeout(()=>{ o.stop(); ctx.close(); }, ms);
-    }catch(e){}
+let current = 0;
+
+/* ====== ELEMENTS ====== */
+const startBtn = document.getElementById('startBtn');
+const titleScreen = document.querySelector('.title-screen');
+const gameScreen = document.querySelector('.game-screen');
+const riddleText = document.getElementById('riddle-text');
+const answerInput = document.getElementById('answerInput');
+const submitBtn = document.getElementById('submitBtn');
+const feedback = document.getElementById('feedback');
+
+/* ====== EVENTS ====== */
+startBtn.addEventListener('click', () => {
+  titleScreen.classList.add('hidden');
+  gameScreen.classList.remove('hidden');
+  loadRiddle();
+});
+
+submitBtn.addEventListener('click', checkAnswer);
+
+function loadRiddle() {
+  if (current < riddles.length) {
+    riddleText.textContent = riddles[current].q;
+    answerInput.value = '';
+    feedback.textContent = '';
+  } else {
+    riddleText.textContent = "🎉 Congratulations! You've finished all the riddles!";
+    answerInput.style.display='none';
+    submitBtn.style.display='none';
   }
-  function startGame(){ idx = 0; showRiddle(); }
-  function showRiddle(){
-    clearInterval(tick);
-    answerShown = false;
-    timeLeft = TIMER_SECONDS;
-    const { q, a } = RIDDLES[idx];
-    screenEl.innerHTML = `
-      <div id="riddle" aria-live="polite">${q}</div>
-      <div id="timer">Time left: ${fmt(timeLeft)}</div>
-      <button class="btn" id="revealBtn">Reveal Answer</button>
-      <div id="answer">Answer: ${a}</div>
-    `;
-    document.getElementById('answer').style.display = 'none';
-    document.getElementById('revealBtn').addEventListener('click', revealAnswer);
-    beep(760, 110);
-    tick = setInterval(()=>{
-      timeLeft--;
-      const t = document.getElementById('timer');
-      if(t) t.textContent = `Time left: ${fmt(timeLeft)}`;
-      if(timeLeft <= 0){
-        clearInterval(tick);
-        revealAnswer();
-      }
-    }, 1000);
+}
+
+function checkAnswer() {
+  const userAns = answerInput.value.trim().toLowerCase();
+  if (userAns === riddles[current].a) {
+    feedback.textContent = "✅ Correct!";
+    current++;
+    setTimeout(loadRiddle, 1000);
+  } else {
+    feedback.textContent = "❌ Try again!";
   }
-  function revealAnswer(){
-    if(answerShown) return;
-    answerShown = true;
-    clearInterval(tick);
-    beep(420, 140);
-    document.getElementById('answer').style.display = 'block';
-    const controls = document.createElement('div');
-    controls.className = 'row';
-    const isLast = idx === RIDDLES.length - 1;
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn';
-    nextBtn.textContent = isLast ? 'Finished! Play Again' : 'Next Riddle';
-    nextBtn.addEventListener('click', ()=>{
-      if(isLast){
-        startGame();
-      }else{
-        idx++;
-        showRiddle();
-      }
-    });
-    controls.appendChild(nextBtn);
-    screenEl.appendChild(controls);
-  }
-  function fmt(s){
-    const m = Math.floor(s/60);
-    const sec = String(s%60).padStart(2,'0');
-    return `${m}:${sec}`;
-  }
-  document.getElementById('startBtn').addEventListener('click', startGame);
+}
 </script>
 </body>
 </html>
