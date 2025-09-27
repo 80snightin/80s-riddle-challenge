@@ -4,12 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>80s Riddle Challenge</title>
-
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
 <style>
-/* ====== BASIC BODY ====== */
 body {
   margin: 0;
   padding: 0;
@@ -24,7 +20,7 @@ body {
   background: radial-gradient(circle at center, #0f0321 0%, #1c0433 100%);
 }
 
-/* ====== ANIMATED GRID ====== */
+/* Animated Grid Background */
 body::before {
   content: "";
   position: absolute;
@@ -40,23 +36,23 @@ body::before {
   to {background-position: 40px 40px, 40px 40px;}
 }
 
-/* ====== TITLE & GAME SCREENS ====== */
-h1, h2 {
-  text-align: center;
-  color: #ff00ff;
-  text-shadow: 0 0 8px #ff00ff, 0 0 16px #ff00ff;
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-.title-screen, .game-screen {
+.container {
   background: rgba(0,0,0,0.6);
   padding: 20px;
   border: 2px solid #00f7ff;
   border-radius: 12px;
   box-shadow: 0 0 20px #00f7ff;
-  max-width: 600px;
+  max-width: 700px;
   text-align: center;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #00ffff;
+  font-size: 18px;
+  line-height: 1.5;
+  /* Neon INSIDE effect (bright fill, subtle glow outside) */
+  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
 }
 
 button {
@@ -68,99 +64,131 @@ button {
   cursor: pointer;
   margin-top: 15px;
   border-radius: 8px;
-  text-shadow: none;
 }
 button:hover {
   opacity: 0.85;
 }
 
-input {
-  display: block;
-  margin: 15px auto;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #00f7ff;
-  border-radius: 8px;
-  width: 80%;
-  text-align: center;
-}
-
 .hidden {display: none;}
-#feedback {
+#timer {
+  font-size: 14px;
   margin-top: 10px;
+  color: #ff00ff;
+  text-shadow: 0 0 4px #ff00ff;
+}
+#answer {
+  margin-top: 15px;
+  color: #ffff00;
+  text-shadow: 0 0 4px #ffff00;
   font-size: 12px;
 }
 </style>
 </head>
 <body>
-  <div class="title-screen">
-    <h1>80s Riddle Challenge</h1>
-    <button id="startBtn">Play Now</button>
-  </div>
+  <div class="container">
+    <h1 id="gameTitle">80s Riddle Challenge</h1>
+    <div id="introScreen">
+      <p>Get ready for the ultimate 80s Riddle Challenge!<br>
+      You’ll have 2 minutes per riddle to write your answer on paper.<br>
+      When the timer ends, click “Reveal Answer”.</p>
+      <button id="startBtn">Start Game</button>
+    </div>
 
-  <div class="game-screen hidden">
-    <h2 id="riddle-text"></h2>
-    <input type="text" id="answerInput" placeholder="Type your answer here">
-    <button id="submitBtn">Submit</button>
-    <p id="feedback"></p>
+    <div id="gameScreen" class="hidden">
+      <h2 id="riddle-text"></h2>
+      <div id="timer">Time left: 2:00</div>
+      <div id="answer" class="hidden"></div>
+      <button id="revealBtn" class="hidden">Reveal Answer</button>
+      <button id="nextBtn" class="hidden">Next Question</button>
+    </div>
+
+    <div id="endScreen" class="hidden">
+      <h2>🎉 Congratulations! 🎉</h2>
+      <p>Thanks for playing the 80s Riddle Challenge!</p>
+    </div>
   </div>
 
 <script>
-/* ====== RIDDLES ====== */
+// ====== RIDDLES ======
 const riddles = [
-  {q:"Ask this question all day long, but always get completely different answers, and yet all the answers will be correct. What is the question?", a:"what time is it"},
-  {q:"They come out at night without being called, and are lost in the day without being stolen. What are they?", a:"stars"},
-  {q:"A man goes out for a walk during a storm with nothing to protect him from the rain. He doesn’t have a hat, a hood or an umbrella. But by the end of his walk, there isn’t a single wet hair on his head. Why doesn’t the man have wet hair?", a:"he’s bald"},
-  {q:"The one who makes me cannot use me. The one who buys me will always buy me for someone else. The one who uses me doesn't know it. What am I?", a:"a coffin"},
-  {q:"I’m tall when I’m young, and I’m short when I’m old. What am I?", a:"a candle"},
-  {q:"David’s father has 3 sons: Snap, Crackle and _____.", a:"david"},
-  {q:"You walk into a room and see a bed. On the bed, there are two dogs, five cats, a giraffe, six cows, and a goose. There are also three doves flying above the bed. How many legs are on the floor?", a:"six"},
-  {q:"I have keys but open no locks; I have space but no room; you can enter but not go inside. What am I?", a:"a keyboard"},
-  {q:"I can be long, I can be short; I can be grown, I can be bought; I can be painted, or I can be bare; I can be round or square. What am I?", a:"a nail"},
-  {q:"I keep no keys but hold a door, You push and pull and push some more. I let you in without a sound, Yet when you leave I still stay round. What am I?", a:"a doorknob"}
+  {q:"Ask this question all day long, but always get completely different answers, and yet all the answers will be correct. What is the question?", a:"What time is it?"},
+  {q:"They come out at night without being called, and are lost in the day without being stolen. What are they?", a:"Stars"},
+  {q:"A man goes out for a walk during a storm with nothing to protect him from the rain. He doesn’t have a hat, a hood or an umbrella. But by the end of his walk, there isn’t a single wet hair on his head. Why doesn’t the man have wet hair?", a:"He’s bald"},
+  {q:"The one who makes me cannot use me. The one who buys me will always buy me for someone else. The one who uses me doesn't know it. What am I?", a:"A coffin"},
+  {q:"I’m tall when I’m young, and I’m short when I’m old. What am I?", a:"A candle"},
+  {q:"David’s father has 3 sons: Snap, Crackle and _____.", a:"David"},
+  {q:"You walk into a room and see a bed. On the bed, there are two dogs, five cats, a giraffe, six cows, and a goose. There are also three doves flying above the bed. How many legs are on the floor?", a:"Six"},
+  {q:"I have keys but open no locks; I have space but no room; you can enter but not go inside. What am I?", a:"A keyboard"},
+  {q:"I can be long, I can be short; I can be grown, I can be bought; I can be painted, or I can be bare; I can be round or square. What am I?", a:"A nail"},
+  {q:"I keep no keys but hold a door, You push and pull and push some more. I let you in without a sound, Yet when you leave I still stay round. What am I?", a:"A doorknob"}
 ];
 
 let current = 0;
+let timerInterval;
+let timeLeft = 120; // 2 minutes per riddle
 
-/* ====== ELEMENTS ====== */
-const startBtn = document.getElementById('startBtn');
-const titleScreen = document.querySelector('.title-screen');
-const gameScreen = document.querySelector('.game-screen');
+// ====== ELEMENTS ======
+const introScreen = document.getElementById('introScreen');
+const gameScreen = document.getElementById('gameScreen');
+const endScreen = document.getElementById('endScreen');
 const riddleText = document.getElementById('riddle-text');
-const answerInput = document.getElementById('answerInput');
-const submitBtn = document.getElementById('submitBtn');
-const feedback = document.getElementById('feedback');
+const timerDisplay = document.getElementById('timer');
+const answerDisplay = document.getElementById('answer');
+const revealBtn = document.getElementById('revealBtn');
+const nextBtn = document.getElementById('nextBtn');
+document.getElementById('startBtn').addEventListener('click', startGame);
+revealBtn.addEventListener('click', revealAnswer);
+nextBtn.addEventListener('click', nextQuestion);
 
-/* ====== EVENTS ====== */
-startBtn.addEventListener('click', () => {
-  titleScreen.classList.add('hidden');
+function startGame(){
+  introScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
+  current = 0;
   loadRiddle();
-});
+}
 
-submitBtn.addEventListener('click', checkAnswer);
-
-function loadRiddle() {
-  if (current < riddles.length) {
+function loadRiddle(){
+  if(current < riddles.length){
     riddleText.textContent = riddles[current].q;
-    answerInput.value = '';
-    feedback.textContent = '';
+    answerDisplay.textContent = '';
+    answerDisplay.classList.add('hidden');
+    revealBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    timeLeft = 120;
+    updateTimer();
+    clearInterval(timerInterval);
+    timerInterval = setInterval(countdown, 1000);
   } else {
-    riddleText.textContent = "🎉 Congratulations! You've finished all the riddles!";
-    answerInput.style.display='none';
-    submitBtn.style.display='none';
+    gameScreen.classList.add('hidden');
+    endScreen.classList.remove('hidden');
   }
 }
 
-function checkAnswer() {
-  const userAns = answerInput.value.trim().toLowerCase();
-  if (userAns === riddles[current].a) {
-    feedback.textContent = "✅ Correct!";
-    current++;
-    setTimeout(loadRiddle, 1000);
-  } else {
-    feedback.textContent = "❌ Try again!";
+function countdown(){
+  timeLeft--;
+  updateTimer();
+  if(timeLeft <= 0){
+    clearInterval(timerInterval);
+    revealBtn.classList.remove('hidden');
   }
+}
+
+function updateTimer(){
+  const minutes = Math.floor(timeLeft/60);
+  const seconds = timeLeft % 60;
+  timerDisplay.textContent = `Time left: ${minutes}:${seconds <10 ? '0'+seconds:seconds}`;
+}
+
+function revealAnswer(){
+  answerDisplay.textContent = `Answer: ${riddles[current].a}`;
+  answerDisplay.classList.remove('hidden');
+  revealBtn.classList.add('hidden');
+  nextBtn.classList.remove('hidden');
+}
+
+function nextQuestion(){
+  current++;
+  loadRiddle();
 }
 </script>
 </body>
