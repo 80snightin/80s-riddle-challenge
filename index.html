@@ -104,6 +104,7 @@ button:hover {
     <div id="endScreen" class="hidden">
       <h2>🎉 Congratulations! 🎉</h2>
       <p>Thanks for playing the 80s Riddle Challenge!</p>
+      <button id="playAgainBtn">Play Again</button>
     </div>
   </div>
 
@@ -136,15 +137,18 @@ const answerDisplay = document.getElementById('answer');
 const revealBtn = document.getElementById('revealBtn');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
+const playAgainBtn = document.getElementById('playAgainBtn');
 
 document.getElementById('startBtn').addEventListener('click', startGame);
 revealBtn.addEventListener('click', revealAnswer);
 nextBtn.addEventListener('click', nextQuestion);
 prevBtn.addEventListener('click', prevQuestion);
+playAgainBtn.addEventListener('click', playAgain);
 
 function startGame(){
   introScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
+  endScreen.classList.add('hidden');
   current = 0;
   loadRiddle();
 }
@@ -199,6 +203,11 @@ function nextQuestion(){
 function prevQuestion(){
   current--;
   loadRiddle();
+}
+
+function playAgain(){
+  endScreen.classList.add('hidden');
+  introScreen.classList.remove('hidden');
 }
 </script>
 </body>
