@@ -10,7 +10,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Press Start 2P', cursive;
-  color: #00f7ff;
+  color: #00ffff; /* neon color but no glow */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,29 +41,26 @@ body::before {
   padding: 20px;
   border: 2px solid #00f7ff;
   border-radius: 12px;
-  box-shadow: 0 0 20px #00f7ff;
   max-width: 700px;
   text-align: center;
 }
 
-h1, h2 {
+h1, h2, p {
   text-align: center;
-  color: #00ffff;
-  font-size: 18px;
-  line-height: 1.5;
-  /* Neon INSIDE effect (bright fill, subtle glow outside) */
-  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+  color: #00ffff; /* neon color but no glow */
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 button {
   background: linear-gradient(90deg,#00f7ff,#ff00ff);
   border: none;
   color: #000;
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 10px 15px;
+  font-size: 12px;
   cursor: pointer;
-  margin-top: 15px;
-  border-radius: 8px;
+  margin: 5px;
+  border-radius: 6px;
 }
 button:hover {
   opacity: 0.85;
@@ -74,12 +71,10 @@ button:hover {
   font-size: 14px;
   margin-top: 10px;
   color: #ff00ff;
-  text-shadow: 0 0 4px #ff00ff;
 }
 #answer {
   margin-top: 15px;
   color: #ffff00;
-  text-shadow: 0 0 4px #ffff00;
   font-size: 12px;
 }
 </style>
@@ -87,10 +82,11 @@ button:hover {
 <body>
   <div class="container">
     <h1 id="gameTitle">80s Riddle Challenge</h1>
+
     <div id="introScreen">
-      <p>Get ready for the ultimate 80s Riddle Challenge!<br>
+      <p>Welcome to the 80s Riddle Challenge!<br>
       You’ll have 2 minutes per riddle to write your answer on paper.<br>
-      When the timer ends, click “Reveal Answer”.</p>
+      Use the buttons below to reveal answers and move between questions.</p>
       <button id="startBtn">Start Game</button>
     </div>
 
@@ -98,8 +94,11 @@ button:hover {
       <h2 id="riddle-text"></h2>
       <div id="timer">Time left: 2:00</div>
       <div id="answer" class="hidden"></div>
-      <button id="revealBtn" class="hidden">Reveal Answer</button>
-      <button id="nextBtn" class="hidden">Next Question</button>
+      <div>
+        <button id="prevBtn" class="hidden">Previous Question</button>
+        <button id="revealBtn">Reveal Answer</button>
+        <button id="nextBtn">Next Question</button>
+      </div>
     </div>
 
     <div id="endScreen" class="hidden">
@@ -136,9 +135,12 @@ const timerDisplay = document.getElementById('timer');
 const answerDisplay = document.getElementById('answer');
 const revealBtn = document.getElementById('revealBtn');
 const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
+
 document.getElementById('startBtn').addEventListener('click', startGame);
 revealBtn.addEventListener('click', revealAnswer);
 nextBtn.addEventListener('click', nextQuestion);
+prevBtn.addEventListener('click', prevQuestion);
 
 function startGame(){
   introScreen.classList.add('hidden');
@@ -148,17 +150,23 @@ function startGame(){
 }
 
 function loadRiddle(){
-  if(current < riddles.length){
+  if(current < riddles.length && current >=0){
     riddleText.textContent = riddles[current].q;
     answerDisplay.textContent = '';
     answerDisplay.classList.add('hidden');
-    revealBtn.classList.add('hidden');
-    nextBtn.classList.add('hidden');
+
+    // Show/hide previous button
+    if(current === 0){
+      prevBtn.classList.add('hidden');
+    } else {
+      prevBtn.classList.remove('hidden');
+    }
+
     timeLeft = 120;
     updateTimer();
     clearInterval(timerInterval);
     timerInterval = setInterval(countdown, 1000);
-  } else {
+  } else if(current >= riddles.length){
     gameScreen.classList.add('hidden');
     endScreen.classList.remove('hidden');
   }
@@ -169,7 +177,6 @@ function countdown(){
   updateTimer();
   if(timeLeft <= 0){
     clearInterval(timerInterval);
-    revealBtn.classList.remove('hidden');
   }
 }
 
@@ -182,12 +189,15 @@ function updateTimer(){
 function revealAnswer(){
   answerDisplay.textContent = `Answer: ${riddles[current].a}`;
   answerDisplay.classList.remove('hidden');
-  revealBtn.classList.add('hidden');
-  nextBtn.classList.remove('hidden');
 }
 
 function nextQuestion(){
   current++;
+  loadRiddle();
+}
+
+function prevQuestion(){
+  current--;
   loadRiddle();
 }
 </script>
